@@ -10,16 +10,37 @@ export default function Dashboard() {
   const [prompt, setPrompt] = useState("");
   const [reflectionText, setReflectionText] = useState("");
   const [reflections, setReflections] = useState([]);
+  const [assessment, setAssessment] = useState(null);
+  const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-    }
+  const token = localStorage.getItem("token");
 
-    const saved = JSON.parse(localStorage.getItem("reflections")) || [];
-    setReflections(saved);
-  }, []);
+  if (!token) {
+    router.replace("/login");
+    return;
+  }
+
+  const saved =
+    JSON.parse(localStorage.getItem("reflections")) || [];
+
+  setReflections(saved);
+
+  const savedHistory =
+  JSON.parse(localStorage.getItem("assessmentHistory")) || [];
+
+setHistory(savedHistory);
+
+const savedAssessment = JSON.parse(
+  localStorage.getItem("assessment")
+);
+
+if (savedAssessment) {
+  setAssessment(savedAssessment);
+}
+}, []);
+
+
 
   const moodData = {
     good: {
@@ -43,6 +64,10 @@ export default function Dashboard() {
       advice: "Let’s slow things down together. A grounding exercise might help."
     }
   };
+
+
+ 
+
 
   const reflectionPrompts = [
     "What’s one thought that keeps returning today?",
@@ -210,6 +235,150 @@ export default function Dashboard() {
           ⚠️ This application provides emotional support only.
         </p>
       </div>
+
+          
+  {/* Assessment Section */}
+
+{!assessment ? (
+
+<div className="bg-white rounded-lg shadow p-6 mb-6 border-l-4 border-blue-500">
+
+<h3 className="text-2xl font-semibold text-blue-600">
+
+🧠 Mental Health Assessment
+
+</h3>
+
+<p className="text-gray-600 mt-2">
+
+Complete a short assessment to personalize your
+therapy experience.
+
+</p>
+
+<Link href="/assessment">
+
+<button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+
+Start Assessment
+
+</button>
+
+</Link>
+
+</div>
+
+) : (
+
+<div className="bg-white rounded-lg shadow p-6 mb-6">
+
+<h3 className="text-2xl font-semibold text-green-600">
+
+Assessment Summary
+
+</h3>
+
+<div className="grid grid-cols-3 gap-4 mt-5">
+
+<div>
+
+<p className="text-gray-500">
+
+Stress Level
+
+</p>
+
+<p className="text-xl font-bold">
+
+{assessment.level}
+
+</p>
+
+</div>
+
+<div>
+
+<p className="text-gray-500">
+
+Score
+
+</p>
+
+<p className="text-xl font-bold">
+
+{assessment.score}
+
+</p>
+
+</div>
+
+<div>
+
+<p className="text-gray-500">
+
+Completed
+
+</p>
+
+<p className="text-xl font-bold">
+
+{assessment.date}
+
+</p>
+
+</div>
+
+</div>
+
+<div className="mt-6">
+
+<h4 className="font-semibold">
+
+Today's Recommendation
+
+</h4>
+
+<ul className="list-disc ml-6 mt-2 text-gray-700">
+
+<li>Continue journaling.</li>
+
+<li>Talk with your AI therapist.</li>
+
+<li>Take short breaks during the day.</li>
+
+</ul>
+
+</div>
+
+</div>
+
+)}
+
+ {history.length > 0 && (
+  <div className="bg-white rounded-lg shadow p-6 mb-6">
+
+    <h3 className="text-xl font-semibold mb-4">
+      Assessment History
+    </h3>
+
+    {history.map((item, index) => (
+      <div
+        key={index}
+        className="flex justify-between border-b py-2"
+      >
+        <span>{item.date}</span>
+
+        <span>{item.level}</span>
+
+        <span>{item.score}</span>
+      </div>
+    ))}
+
+  </div>
+)}
+
     </Layout>
+
+
   );
 }

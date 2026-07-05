@@ -10,6 +10,9 @@ import os
 
 from database import SessionLocal
 import models
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 
@@ -29,11 +32,11 @@ def verify_password(plain: str, hashed: str) -> bool:
     return pwd_context.verify(plain, hashed)
 
 # ---------------- JWT CONFIG ----------------
-SECRET_KEY = "5413282f66b9e05587dc6c7bf6a8a20f4bc91de9b566af9f421ef9da1d6dd246"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 # ---------------- DB DEPENDENCY ----------------
 def get_db():

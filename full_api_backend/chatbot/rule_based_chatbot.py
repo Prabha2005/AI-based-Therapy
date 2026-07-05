@@ -1,51 +1,139 @@
-def generate_response(message: str, age_group: str) -> str:
-    msg = message.lower()
+#from chatbot.emotion_detector import detect_emotion
+from chatbot.emotion_model import detect_emotion
+# ==========================
+# THERAPY RESPONSES
+# ==========================
 
-    # ---------- CHILD (5–10) ----------
-    if age_group == "5-10":
-        if any(w in msg for w in ["lonely", "alone", "sad"]):
-            return (
-                "I’m sorry you feel this way. "
-                "You are safe here. "
-                "Would you like to tell me what made you feel sad?"
-            )
+RESPONSES = {
 
-    # ---------- TEEN (11–17) ----------
-    if age_group == "11-17":
-        if any(w in msg for w in ["lonely", "alone"]):
-            return (
-                "Feeling lonely can be really hard, especially at your age. "
-                "You’re not weak for feeling this way. "
-                "Is this happening mostly at school or at home?"
-            )
+    "stress": {
 
-        if any(w in msg for w in ["bullied", "bullying"]):
-            return (
-                "I’m really sorry you’re experiencing this. "
-                "Bullying can deeply hurt. "
-                "Do you want to talk about who is doing this?"
-            )
+        "18-40": (
+            "It sounds like a lot is on your plate right now. "
+            "Let's slow down for a moment. "
+            "What's the biggest thing stressing you today?"
+        ),
 
-    # ---------- ADULT (18–40) ----------
-    if age_group == "18-40":
-        if any(w in msg for w in ["stress", "overwhelmed"]):
-            return (
-                "It sounds like a lot is on your plate right now. "
-                "Let’s slow down for a moment. "
-                "What’s the biggest thing stressing you today?"
-            )
+        "11-17": (
+            "School and growing up can feel overwhelming sometimes. "
+            "Would you like to tell me what's causing your stress?"
+        ),
 
-    # ---------- 41+ ----------
-    if age_group == "41+":
-        if any(w in msg for w in ["tired", "worried"]):
-            return (
-                "It sounds like you’ve been carrying a lot. "
-                "You deserve care and understanding. "
-                "Would you like to share what’s been weighing on you?"
-            )
+        "5-10": (
+            "It's okay to feel stressed sometimes. "
+            "Can you tell me what happened today?"
+        ),
 
-    # ---------- DEFAULT ----------
-    return (
-        "I’m here with you. "
-        "Please feel free to share more about what you’re feeling."
+        "41+": (
+            "Life can bring many responsibilities. "
+            "Would talking about what's worrying you help?"
+        )
+
+    },
+
+    "lonely": {
+
+        "18-40": (
+            "Feeling lonely can be painful. "
+            "Would you like to tell me when you started feeling this way?"
+        ),
+
+        "11-17": (
+            "Feeling lonely at your age can be really difficult. "
+            "Did something happen recently?"
+        ),
+
+        "5-10": (
+            "I'm here with you. "
+            "Would you like to tell me why you're feeling lonely?"
+        ),
+
+        "41+": (
+            "Loneliness can affect anyone. "
+            "I'm here to listen if you'd like to share."
+        )
+
+    },
+    "happy": {
+
+    "18-40": (
+        "I'm really happy to hear you're feeling good today. "
+        "What made today a positive day for you?"
+    ),
+
+    "11-17": (
+        "That's wonderful! "
+        "What happened today that made you feel happy?"
+    ),
+
+    "5-10": (
+        "Yay! I'm glad you're happy today! "
+        "Do you want to tell me what made you smile?"
+    ),
+
+    "41+": (
+        "It's always nice to hear positive moments. "
+        "Would you like to share what's going well?"
     )
+},
+
+"neutral": {
+
+    "18-40": (
+        "Thank you for sharing. "
+        "Would you like to tell me more about how today has been?"
+    ),
+
+    "11-17": (
+        "I'm here to listen. "
+        "What's been on your mind today?"
+    ),
+
+    "5-10": (
+        "Would you like to tell me about your day?"
+    ),
+
+    "41+": (
+        "How has your day been so far?"
+    )
+},
+
+}
+
+
+EMOTION_MAP = {
+    "fear": "stress",
+    "anger": "stress",
+    "disgust": "stress",
+    "sadness": "lonely",
+    "joy": "happy",
+    "neutral": "neutral",
+    "surprise": "neutral"
+}
+
+DEFAULT_RESPONSE = (
+    "I'm here to listen. "
+    "Please tell me more about how you're feeling."
+)
+
+
+# ==========================
+# CHATBOT
+# ==========================
+
+def generate_response(message: str, age_group: str):
+
+    emotion = detect_emotion(message)
+
+    emotion = EMOTION_MAP.get(
+    emotion,
+    "neutral"
+)
+
+    if emotion in RESPONSES:
+
+        if age_group in RESPONSES[emotion]:
+
+            return RESPONSES[emotion][age_group]
+
+    return DEFAULT_RESPONSE

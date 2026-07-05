@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Layout from "../components/layout";
 import { loginUser } from "../utils/api";
@@ -10,6 +10,13 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+
+   useEffect(() => {
+    if (localStorage.getItem("token")) {
+        router.replace("/dashboard");
+    }
+}, []);
+
   const handleLogin = async () => {
     if (!email || !password) {
       setError("All fields are required");
@@ -19,6 +26,8 @@ export default function Login() {
     setLoading(true);
     const response = await loginUser(email, password);
     setLoading(false);
+
+   
 
     if (response.success) {
       router.push("/dashboard");

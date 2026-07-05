@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Layout from "../components/layout";
 import { registerUser } from "../utils/api";
@@ -10,11 +10,26 @@ export default function Register() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+        router.replace("/dashboard");
+    }
+}, []);
+
+  
+
   const handleRegister = async () => {
-    if (!email || !password) {
-      setError("All fields are required");
+    const emailRegex =
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+   
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address.");
       return;
     }
+    if (password.length < 8) {
+    setError("Password must be at least 8 characters.");
+    return;
+}
 
     setError("");
     setLoading(true);
@@ -23,8 +38,12 @@ export default function Register() {
 
     setLoading(false);
 
+
+    
+
     if (response.success) {
-      router.push("/dashboard");
+      alert("Registration successful! Please login.");
+      router.push("/login");
     } else {
       setError(response.message);
     }

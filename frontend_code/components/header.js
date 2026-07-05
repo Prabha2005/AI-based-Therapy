@@ -42,9 +42,13 @@ export default function Header() {
               </Link>
           
 
-              <Link href="/chatbot" className="hover:underline">
-                Chatbot
-              </Link>
+               <Link href="/assessment" className="hover:underline">
+      Assessment
+    </Link>
+
+    <Link href="/chatbot" className="hover:underline">
+      AI Therapist
+    </Link>
               <Link href="/profile" className="hover:underline">
                 Profile
               </Link>

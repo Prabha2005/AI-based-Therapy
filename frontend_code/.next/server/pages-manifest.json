@@ -2,9 +2,10 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/about": "pages/about.js",
-  "/dashboard": "pages/dashboard.js",
   "/profile": "pages/profile.js",
   "/chatbot": "pages/chatbot.js",
+  "/about": "pages/about.js",
+  "/dashboard": "pages/dashboard.js",
+  "/assessment": "pages/assessment.js",
   "/": "pages/index.js"
 }

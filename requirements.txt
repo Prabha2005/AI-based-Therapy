@@ -7,7 +7,6 @@ python-dotenv
 requests
 transformers
 torch
-openai
 email-validator
 python-multipart
 pydantic

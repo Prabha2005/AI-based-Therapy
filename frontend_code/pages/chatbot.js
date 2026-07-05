@@ -16,14 +16,15 @@ export default function Chatbot() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/ai/chat", {
+      const response = await fetch("http://127.0.0.1:8000/chat/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
   message: userMessage.text,
-  history: messages,
+  ageGroup: "18-40"
 }),
 
         

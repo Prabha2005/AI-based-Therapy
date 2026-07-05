@@ -1,165 +1,220 @@
-import { useState } from "react";
-import { useRouter } from "next/router";
+import Link from "next/link";
 import Layout from "../components/layout";
 
-const QUESTIONS = {
-  "5-10": [
-    "I feel sad sometimes",
-    "I feel scared or worried",
-    "I enjoy playing with others",
-  ],
-  "11-17": [
-    "I feel stressed about studies",
-    "I feel lonely or misunderstood",
-    "I feel pressure from others",
-  ],
-  "18-40": [
-    "I feel overwhelmed by responsibilities",
-    "I feel anxious about the future",
-    "I struggle to relax",
-  ],
-  "41+": [
-    "I feel tired or low in energy",
-    "I feel emotionally supported",
-    "I feel worried often",
-  ],
-};
-
 export default function About() {
-  const router = useRouter();
-
-  const [step, setStep] = useState(1);
-  const [ageGroup, setAgeGroup] = useState("");
-  const [gender, setGender] = useState("");
-  const [answers, setAnswers] = useState({});
-  const [result, setResult] = useState("");
-
-  const handleAnswerChange = (q, value) => {
-    setAnswers({ ...answers, [q]: Number(value) });
-  };
-
-  const evaluateStress = () => {
-    const total = Object.values(answers).reduce((a, b) => a + b, 0);
-
-    let level = "Low";
-    if (total > 8 && total <= 13) level = "Moderate";
-    if (total > 13) level = "High";
-
-    setResult(level);
-
-    localStorage.setItem(
-      "profile",
-      JSON.stringify({ ageGroup, gender, stressLevel: level })
-    );
-
-    setStep(4);
-  };
-
   return (
     <Layout>
-      <div className="min-h-screen bg-gray-100 p-6">
-        <div className="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+      <div className="bg-gray-50 min-h-screen">
 
-          {/* STEP 1: AGE */}
-          {step === 1 && (
-            <>
-              <h2 className="text-2xl font-bold mb-4">Select Your Age Group</h2>
-              <select
-                className="w-full border p-2 rounded"
-                onChange={(e) => setAgeGroup(e.target.value)}
-              >
-                <option value="">Choose</option>
-                <option value="5-10">5 – 10</option>
-                <option value="11-17">11 – 17</option>
-                <option value="18-40">18 – 40</option>
-                <option value="41+">41+</option>
-              </select>
+        {/* Hero Section */}
+        <section className="bg-blue-600 text-white py-16">
+          <div className="max-w-5xl mx-auto px-6 text-center">
+            <h1 className="text-4xl md:text-5xl font-bold">
+              About AI Therapy Assistant
+            </h1>
 
-              <button
-                disabled={!ageGroup}
-                onClick={() => setStep(2)}
-                className="mt-4 px-6 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
-              >
-                Next
+            <p className="mt-6 text-lg leading-8 max-w-3xl mx-auto">
+              Everyone experiences stress, worries, and emotional ups and
+              downs. AI Therapy Assistant provides a safe space where you can
+              better understand your emotions, reflect on your thoughts, and
+              receive supportive guidance whenever you need it.
+            </p>
+
+            <Link href="/assessment">
+              <button className="mt-8 bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                Start Your Assessment
               </button>
-            </>
-          )}
+            </Link>
+          </div>
+        </section>
 
-          {/* STEP 2: GENDER */}
-          {step === 2 && (
-            <>
-              <h2 className="text-2xl font-bold mb-4">Select Gender</h2>
-              <select
-                className="w-full border p-2 rounded"
-                onChange={(e) => setGender(e.target.value)}
-              >
-                <option value="">Choose</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="NA">Prefer not to say</option>
-              </select>
+        {/* What You Can Do */}
+        <section className="max-w-6xl mx-auto px-6 py-16">
 
-              <button
-                disabled={!gender}
-                onClick={() => setStep(3)}
-                className="mt-4 px-6 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
-              >
-                Start Assessment
-              </button>
-            </>
-          )}
+          <h2 className="text-3xl font-bold text-center mb-12">
+            What You Can Do
+          </h2>
 
-          {/* STEP 3: QUESTIONS */}
-          {step === 3 && (
-            <>
-              <h2 className="text-2xl font-bold mb-4">
-                Emotional Self-Assessment
-              </h2>
+          <div className="grid md:grid-cols-2 gap-8">
 
-              {QUESTIONS[ageGroup].map((q, i) => (
-                <div key={i} className="mb-4">
-                  <label className="block font-medium mb-1">{q}</label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="5"
-                    onChange={(e) =>
-                      handleAnswerChange(`q${i}`, e.target.value)
-                    }
-                    className="w-full"
-                  />
-                </div>
-              ))}
+            <div className="bg-white p-6 rounded-xl shadow">
+              <h3 className="text-xl font-semibold mb-3">
+                🧠 Mental Health Assessment
+              </h3>
 
-              <button
-                onClick={evaluateStress}
-                className="mt-4 px-6 py-2 bg-green-500 text-white rounded"
-              >
-                View Result
-              </button>
-            </>
-          )}
-
-          {/* STEP 4: RESULT */}
-          {step === 4 && (
-            <div className="text-center">
-              <h2 className="text-2xl font-bold mb-2">
-                Your Stress Level: {result}
-              </h2>
-              <p className="text-gray-600 mb-4">
-                This assessment is for self-awareness only.
+              <p className="text-gray-600 leading-7">
+                Complete a short assessment to understand your emotional
+                well-being. It helps you recognize how you're feeling and
+                provides supportive recommendations based on your responses.
               </p>
-
-              <button
-                onClick={() => router.push("/profile")}
-                className="px-6 py-2 bg-blue-500 text-white rounded"
-              >
-                Go to Profile
-              </button>
             </div>
-          )}
 
-        </div>
+            <div className="bg-white p-6 rounded-xl shadow">
+              <h3 className="text-xl font-semibold mb-3">
+                🤖 AI Therapy Chat
+              </h3>
+
+              <p className="text-gray-600 leading-7">
+                Talk freely with your AI companion in a private and supportive
+                environment. The chatbot listens, understands your emotions,
+                and encourages healthy conversations.
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow">
+              <h3 className="text-xl font-semibold mb-3">
+                📝 Reflection Journal
+              </h3>
+
+              <p className="text-gray-600 leading-7">
+                Write about your thoughts, emotions, and daily experiences.
+                Looking back at your reflections can help you notice positive
+                changes and personal growth over time.
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow">
+              <h3 className="text-xl font-semibold mb-3">
+                😊 Daily Mood Check-In
+              </h3>
+
+              <p className="text-gray-600 leading-7">
+                Record how you're feeling each day. Small daily check-ins can
+                help you become more aware of your emotions and build healthy
+                self-care habits.
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* How It Works */}
+        <section className="bg-white py-16">
+
+          <div className="max-w-5xl mx-auto px-6">
+
+            <h2 className="text-3xl font-bold text-center mb-12">
+              How It Works
+            </h2>
+
+            <div className="grid md:grid-cols-5 gap-6 text-center">
+
+              <div>
+                <div className="text-4xl mb-3">👤</div>
+                <h3 className="font-semibold">Create an Account</h3>
+                <p className="text-gray-600 mt-2 text-sm">
+                  Register and securely access your personal dashboard.
+                </p>
+              </div>
+
+              <div>
+                <div className="text-4xl mb-3">🧠</div>
+                <h3 className="font-semibold">Take Assessment</h3>
+                <p className="text-gray-600 mt-2 text-sm">
+                  Complete a short emotional wellness assessment.
+                </p>
+              </div>
+
+              <div>
+                <div className="text-4xl mb-3">🤖</div>
+                <h3 className="font-semibold">Chat with AI</h3>
+                <p className="text-gray-600 mt-2 text-sm">
+                  Share your thoughts and receive supportive responses.
+                </p>
+              </div>
+
+              <div>
+                <div className="text-4xl mb-3">📝</div>
+                <h3 className="font-semibold">Reflect</h3>
+                <p className="text-gray-600 mt-2 text-sm">
+                  Save your reflections and build a personal journal.
+                </p>
+              </div>
+
+              <div>
+                <div className="text-4xl mb-3">📈</div>
+                <h3 className="font-semibold">Track Progress</h3>
+                <p className="text-gray-600 mt-2 text-sm">
+                  Monitor your emotional journey and continue building healthy habits.
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* Why Choose */}
+        <section className="max-w-5xl mx-auto px-6 py-16">
+
+          <h2 className="text-3xl font-bold text-center mb-10">
+            Why Choose AI Therapy Assistant?
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-6">
+
+            <div className="bg-blue-50 p-5 rounded-lg">
+              ✅ Available whenever you need support
+            </div>
+
+            <div className="bg-blue-50 p-5 rounded-lg">
+              ✅ Private and secure conversations
+            </div>
+
+            <div className="bg-blue-50 p-5 rounded-lg">
+              ✅ Encourages healthy self-reflection
+            </div>
+
+            <div className="bg-blue-50 p-5 rounded-lg">
+              ✅ Simple and easy to use
+            </div>
+
+          </div>
+
+        </section>
+
+        {/* Disclaimer */}
+        <section className="bg-yellow-50 py-14">
+
+          <div className="max-w-4xl mx-auto px-6 text-center">
+
+            <h2 className="text-2xl font-bold mb-4">
+              Important Information
+            </h2>
+
+            <p className="text-gray-700 leading-8">
+              AI Therapy Assistant is designed to provide emotional support,
+              self-reflection, and wellness guidance. It is <strong>not</strong> a
+              replacement for professional medical advice, diagnosis, or mental
+              health treatment. If you are experiencing severe emotional distress
+              or are in crisis, please contact a qualified mental health
+              professional or your local emergency services immediately.
+            </p>
+
+          </div>
+
+        </section>
+
+        {/* CTA */}
+        <section className="py-16 text-center">
+
+          <h2 className="text-3xl font-bold">
+            Ready to Begin Your Wellness Journey?
+          </h2>
+
+          <p className="mt-4 text-gray-600">
+            Take your first step towards understanding your emotional well-being.
+          </p>
+
+          <Link href="/assessment">
+            <button className="mt-8 bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition">
+              Start Assessment
+            </button>
+          </Link>
+
+        </section>
+
       </div>
     </Layout>
   );

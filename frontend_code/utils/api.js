@@ -5,27 +5,31 @@ const BASE_URL = "http://127.0.0.1:8000";
 ===================== */
 export async function loginUser(email, password) {
   try {
-    const response = await fetch(`${BASE_URL}/auth/token`, {
+    const response = await fetch(`${BASE_URL}/auth/login`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
       },
-      body: new URLSearchParams({
-        username: email,
-        password: password,
+      body: JSON.stringify({
+        email,
+        password,
       }),
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      throw new Error("Invalid email or password");
+      throw new Error(data.detail || "Invalid email or password");
     }
 
-    const data = await response.json();
     localStorage.setItem("token", data.access_token);
 
     return { success: true };
   } catch (error) {
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: error.message,
+    };
   }
 }
 
@@ -42,8 +46,11 @@ export async function registerUser(email, password) {
       body: JSON.stringify({ email, password }),
     });
 
+    const data = await response.json();
+    console.log("Register Response:", data);
+
     if (!response.ok) {
-      throw new Error("Registration failed");
+      throw new Error(data.detail || "Registration failed");
     }
 
     return { success: true };
@@ -51,6 +58,7 @@ export async function registerUser(email, password) {
     return { success: false, message: error.message };
   }
 }
+
 
 /* =====================
    AUTH HEADER
