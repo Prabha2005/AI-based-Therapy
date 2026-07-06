@@ -38,6 +38,7 @@ frontend_code/.next/
 Thumbs.db
 .vscode/
 .idea/
+.next
 
 # ======================
 # Build / Cache
