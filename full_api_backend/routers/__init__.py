@@ -1,1 +1,1 @@
-from routers import auth, chatbot, users
+from routers import auth, users, journal
