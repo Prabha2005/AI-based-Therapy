@@ -8,7 +8,7 @@ bcrypt
 python-multipart
 email-validator
 pydantic
-psycopg2-binaryannotated-types==0.7.0
+#psycopg2-binaryannotated-types==0.7.0
 bcrypt==4.0.1
 dnspython==2.8.0
 email-validator==2.3.0
