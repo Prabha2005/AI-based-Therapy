@@ -8,7 +8,10 @@ import requests
 from database import Base, engine
 from routers import auth, users, chatbot, journal
 
-
+app = FastAPI(
+    title="AI-Based Therapy Assistant",
+    version="1.0.0"
+)
 
 
 # ---------------- ENV ----------------
