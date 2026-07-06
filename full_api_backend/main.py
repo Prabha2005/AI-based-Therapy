@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import requests
 
 from database import Base, engine
-from routers import auth, users, chatbot, journal
+from routers import auth, users, journal
 
 app = FastAPI(
     title="AI-Based Therapy Assistant",
@@ -143,7 +143,7 @@ app.add_middleware(
 # Existing routers
 app.include_router(auth.router)
 app.include_router(users.router)
-app.include_router(chatbot.router)
+#app.include_router(chatbot.router)
 app.include_router(journal.router)
 # AI router
 app.include_router(router, prefix="/ai")
