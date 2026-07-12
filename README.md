@@ -4,6 +4,19 @@ AI Therapy Assistant is a web-based mental wellness platform that provides users
 
 ---
 
+![Next.js](https://img.shields.io/badge/Next.js-React-black)
+![FastAPI](https://img.shields.io/badge/FastAPI-Python-green)
+![License](https://img.shields.io/badge/License-MIT-blue)
+
+---
+
+## 🌐 Live Demo
+
+- **Frontend:** https://ai-based-therapy.vercel.app
+- **Backend API:** https://ai-based-therapy-backend.onrender.com
+
+---
+
 ## ✨ Features
 
 - 🔐 Secure User Registration & Login (JWT Authentication)
@@ -27,6 +40,40 @@ AI Therapy Assistant is a web-based mental wellness platform that provides users
 5. Monitor your emotional journey through assessments.
 
 ---
+
+## 🧠 AI Workflow
+
+1. User submits a message through the React frontend.
+2. The request is sent to the FastAPI backend.
+3. The backend performs emotion analysis using a Hugging Face Transformer model.
+4. Based on the detected emotion and conversation context, the response engine generates supportive guidance.
+5. The AI response is returned to the frontend and displayed in the chat interface.
+
+---
+
+## 🏗️ Architecture
+
+```text
+User
+   │
+   ▼
+Next.js Frontend
+   │
+REST API
+   ▼
+FastAPI Backend
+   │
+ ├── JWT Authentication
+ ├── Emotion Detection
+ ├── AI Chatbot
+ └── SQLAlchemy
+        │
+        ▼
+     SQLite Database
+```
+
+---
+
 
 ## 🛠️ Tech Stack
 
@@ -127,30 +174,34 @@ http://localhost:3000
 
 ## 🔑 Environment Variables
 
-Create a `.env` file inside the backend folder.
+Copy the example environment file and add your own values:
 
-```env
-HF_API_TOKEN=your_huggingface_api_token
-SECRET_KEY=your_secret_key
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=60
-DATABASE_URL=sqlite:///./database.db
+```bash
+cp .env.example .env
 ```
 
----
+Configure the following variables before running the backend:
 
-## 📸 Screenshots
+- HF_API_TOKEN
+- SECRET_KEY
+- ALGORITHM
+- ACCESS_TOKEN_EXPIRE_MINUTES
+- DATABASE_URL
 
-You can add screenshots here after deployment.
-
-- Home Page
-- Dashboard
-- Assessment
-- AI Chatbot
-- Reflection Journal
-- About Page
+> **Note:** The `.env` file is intentionally excluded from Git for security reasons. Use `.env.example` as a template.
 
 ---
+
+
+## ☁️ Deployment
+
+- Frontend: Vercel
+- Backend: Render
+- Database: SQLite
+
+
+---
+
 
 ## ⚠️ Disclaimer
 
@@ -173,5 +224,24 @@ If you are experiencing severe emotional distress or a mental health emergency, 
 - 🌐 Cloud Deployment
 
 ---
+
+
+## 📸 Screenshots
+
+### Home Page
+
+![Home](screenshots/home.png)
+
+### Dashboard
+
+![Dashboard](screenshots/dashboard.png)
+
+### AI Chatbot
+
+![Chatbot](screenshots/chatbot.png)
+
+### Assessment
+
+![Assessment](screenshots/assessment.png)
 
 ⭐ If you found this project useful, consider giving it a star.

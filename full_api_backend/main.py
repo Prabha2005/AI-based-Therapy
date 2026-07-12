@@ -18,6 +18,7 @@ app = FastAPI(
 load_dotenv()
 
 HF_API_TOKEN = os.getenv("HF_API_TOKEN")
+print("HF_API_TOKEN:", HF_API_TOKEN)
 HF_MODEL_URL = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium"
 
 headers = {
@@ -82,6 +83,10 @@ def chat_with_ai(request: ChatRequest):
             timeout=20
         )
 
+        print("Status:", response.status_code)
+        print("HF Response:", response.text)
+
+
         result = response.json()
 
         # ---------- AI Reply Handling ----------
@@ -118,17 +123,12 @@ def chat_with_ai(request: ChatRequest):
         }
 
     except Exception as e:
-        print("HF ERROR:", e)
+        import traceback
+        traceback.print_exc()
         return {
-            "reply": "AI service is temporarily unavailable. Please try again.",
+            "reply": str(e),
             "suggestions": []
         }
-
-# ---------------- APP ----------------
-app = FastAPI(
-    title="AI-Based Therapy Assistant",
-    version="1.0.0"
-)
 
 Base.metadata.create_all(bind=engine)
 
