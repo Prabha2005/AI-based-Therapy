@@ -225,23 +225,4 @@ If you are experiencing severe emotional distress or a mental health emergency, 
 
 ---
 
-
-## 📸 Screenshots
-
-### Home Page
-
-![Home](screenshots/home.png)
-
-### Dashboard
-
-![Dashboard](screenshots/dashboard.png)
-
-### AI Chatbot
-
-![Chatbot](screenshots/chatbot.png)
-
-### Assessment
-
-![Assessment](screenshots/assessment.png)
-
 ⭐ If you found this project useful, consider giving it a star.
