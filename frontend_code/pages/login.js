@@ -15,7 +15,7 @@ export default function Login() {
     if (localStorage.getItem("token")) {
         router.replace("/dashboard");
     }
-}, []);
+}, [router]);
 
   const handleLogin = async () => {
     if (!email || !password) {
