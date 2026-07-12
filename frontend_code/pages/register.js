@@ -14,7 +14,7 @@ export default function Register() {
     if (localStorage.getItem("token")) {
         router.replace("/dashboard");
     }
-}, []);
+}, [router]);
 
   
 
