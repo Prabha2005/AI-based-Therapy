@@ -16,7 +16,8 @@ export async function loginUser(email, password) {
       }),
     });
 
-    const data = await response.json();
+    //const data = await response.json();
+    const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
       throw new Error(data.detail || "Invalid email or password");
