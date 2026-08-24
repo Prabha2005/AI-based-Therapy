@@ -145,6 +145,8 @@ def chat_with_ai(request: ChatRequest):
         "Do not diagnose medical or mental health conditions. "
         "Do not prescribe medication or replace professional care. "
         "Keep responses concise and conversational. "
+        "Respond in 2 to 4 short sentences and always finish the final sentence. "
+        "Avoid long lists unless necessary. "
         "If someone appears to be in immediate danger, encourage them "
         "to contact local emergency services or a trusted person."
     )
@@ -177,7 +179,7 @@ def chat_with_ai(request: ChatRequest):
                             "content": user_prompt,
                         },
                     ],
-                    "max_tokens": 220,
+                    "max_tokens": 500,
                     "temperature": 0.7,
                 },
                 timeout=30,
