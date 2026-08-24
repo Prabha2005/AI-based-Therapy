@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
@@ -8,146 +8,270 @@ import requests
 from database import Base, engine
 from routers import auth, users, journal
 
-app = FastAPI(
-    title="AI-Based Therapy Assistant",
-    version="1.0.0"
-)
-
-
-# ---------------- ENV ----------------
 load_dotenv()
 
+app = FastAPI(
+    title="AI-Based Therapy Assistant",
+    version="1.1.0"
+)
+
 HF_API_TOKEN = os.getenv("HF_API_TOKEN")
-print("HF_API_TOKEN:", HF_API_TOKEN)
-HF_MODEL_URL = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium"
 
-headers = {
-    "Authorization": f"Bearer {HF_API_TOKEN}"
-}
+if not HF_API_TOKEN:
+    print("WARNING: HF_API_TOKEN is not configured.")
 
-# ---------------- AI ROUTER ----------------
+HF_CHAT_URL = "https://router.huggingface.co/v1/chat/completions"
+
+# Hugging Face currently supports provider-routed chat models.
+HF_MODEL = "openai/gpt-oss-120b:fastest"
+
 router = APIRouter()
+
 
 class ChatRequest(BaseModel):
     message: str
     history: list = []
 
+
+def detect_emotion(message: str) -> str:
+    text = message.lower()
+
+    emotion_keywords = {
+        "stress": [
+            "stress",
+            "stressed",
+            "overwhelmed",
+            "pressure",
+            "deadline",
+            "exam",
+        ],
+        "lonely": [
+            "lonely",
+            "alone",
+            "isolated",
+            "nobody",
+        ],
+        "sad": [
+            "sad",
+            "cry",
+            "crying",
+            "down",
+            "unhappy",
+        ],
+        "anxiety": [
+            "anxiety",
+            "anxious",
+            "panic",
+            "worried",
+            "fear",
+            "nervous",
+        ],
+        "happy": [
+            "happy",
+            "great",
+            "good",
+            "excited",
+            "awesome",
+        ],
+    }
+
+    for emotion, keywords in emotion_keywords.items():
+        if any(keyword in text for keyword in keywords):
+            return emotion
+
+    return "neutral"
+
+
+def get_fallback_response(emotion: str) -> str:
+    responses = {
+        "stress": (
+            "It sounds like you may be under a lot of pressure right now. "
+            "Would you like to tell me what is causing the most stress?"
+        ),
+        "lonely": (
+            "Feeling lonely can be difficult. "
+            "If you'd like, you can tell me more about what has been making you feel disconnected."
+        ),
+        "sad": (
+            "I'm sorry you're having a difficult moment. "
+            "Would you like to share what has been weighing on you?"
+        ),
+        "anxiety": (
+            "It sounds like you're feeling anxious. "
+            "We can talk through what is worrying you and take it one part at a time."
+        ),
+        "happy": (
+            "I'm glad to hear that. "
+            "What happened that made you feel this way?"
+        ),
+        "neutral": (
+            "I'm here to listen. "
+            "Tell me a little more about what you're experiencing."
+        ),
+    }
+
+    return responses[emotion]
+
+
 @router.post("/chat")
 def chat_with_ai(request: ChatRequest):
-    try:
-        # ---------- Emotion Extraction from History ----------
-        emotions = []
-        for msg in request.history:
-            text = msg["text"].lower()
-            if "lonely" in text:
-                emotions.append("lonely")
-            if "anxious" in text or "anxiety" in text:
-                emotions.append("anxious")
-            if "sad" in text:
-                emotions.append("sad")
-            if "stress" in text:
-                emotions.append("stressed")
+    message = request.message.strip()
 
-        emotion_context = ""
-        if emotions:
-            unique_emotions = ", ".join(set(emotions))
-            emotion_context = f"The user has previously mentioned feeling {unique_emotions}. "
-
-        # ---------- Prompt Construction ----------
-        prompt = (
-            "You are an empathetic and supportive mental health assistant. "
-            "Your role is to listen carefully, acknowledge emotions, and respond with kindness and understanding. "
-            "Do NOT provide medical advice or diagnosis. "
-            "Encourage the user gently to express their feelings.\n\n"
-            f"{emotion_context}"
-            f"User says: \"{request.message}\"\n"
-            "Your response:"
+    if not message:
+        raise HTTPException(
+            status_code=400,
+            detail="Message cannot be empty."
         )
 
-        payload = {
-            "inputs": prompt,
-            "parameters": {
-                "max_new_tokens": 150,
-                "temperature": 0.9,
-                "top_p": 0.95,
-                "do_sample": True,
-                "return_full_text": False
-            }
-        }
+    emotion = detect_emotion(message)
 
-        # ---------- Hugging Face API Call ----------
-        response = requests.post(
-            HF_MODEL_URL,
-            headers=headers,
-            json=payload,
-            timeout=20
-        )
+    history_text = []
 
-        print("Status:", response.status_code)
-        print("HF Response:", response.text)
+    for item in request.history[-6:]:
+        if isinstance(item, dict):
+            text = item.get("text", "")
+            sender = item.get("sender", "user")
 
+            if text:
+                history_text.append(
+                    f"{sender}: {text}"
+                )
 
-        result = response.json()
+    conversation_context = "\n".join(history_text)
 
-        # ---------- AI Reply Handling ----------
-        if isinstance(result, list) and len(result) > 0 and "generated_text" in result[0]:
-            reply = result[0]["generated_text"]
-        else:
-            reply = "I’m really glad you shared this. Would you like to tell me more?"
+    system_prompt = (
+        "You are an empathetic emotional wellness assistant. "
+        "Listen carefully and provide supportive, non-judgmental responses. "
+        "Do not diagnose medical or mental health conditions. "
+        "Do not prescribe medication or replace professional care. "
+        "Keep responses concise and conversational. "
+        "If someone appears to be in immediate danger, encourage them "
+        "to contact local emergency services or a trusted person."
+    )
 
-        # ---------- Button Suggestions ----------
-        text = request.message.lower()
+    user_prompt = (
+        f"Detected emotional context: {emotion}.\n"
+        f"Recent conversation:\n{conversation_context}\n\n"
+        f"User: {message}"
+    )
 
-        if "lonely" in text:
-            suggestions = [
-                "Why do I feel lonely?",
-                "I feel lonely most days",
-                "I want coping tips"
-            ]
-        elif "anxious" in text or "anxiety" in text:
-            suggestions = [
-                "What causes my anxiety?",
-                "I feel anxious at night",
-                "How can I calm myself?"
-            ]
-        else:
-            suggestions = [
-                "Tell me more",
-                "I want to understand my feelings",
-                "What should I do next?"
-            ]
+    reply = None
 
-        return {
-            "reply": reply,
-            "suggestions": suggestions
-        }
+    if HF_API_TOKEN:
+        try:
+            response = requests.post(
+                HF_CHAT_URL,
+                headers={
+                    "Authorization": f"Bearer {HF_API_TOKEN}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": HF_MODEL,
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": system_prompt,
+                        },
+                        {
+                            "role": "user",
+                            "content": user_prompt,
+                        },
+                    ],
+                    "max_tokens": 220,
+                    "temperature": 0.7,
+                },
+                timeout=30,
+            )
+            response.raise_for_status()
 
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        return {
-            "reply": str(e),
-            "suggestions": []
-        }
+            result = response.json()
+
+            reply = (
+                result
+                .get("choices", [{}])[0]
+                .get("message", {})
+                .get("content")
+            )
+
+        except Exception as error:
+            print(
+                "Hugging Face request failed:",
+                str(error)
+            )
+
+    if not reply:
+        reply = get_fallback_response(emotion)
+
+    if emotion == "lonely":
+        suggestions = [
+            "Why might I feel lonely?",
+            "How can I reconnect with people?",
+            "I want to talk more",
+        ]
+
+    elif emotion == "anxiety":
+        suggestions = [
+            "Why am I feeling anxious?",
+            "Help me understand my worry",
+            "How can I calm down?",
+        ]
+
+    elif emotion == "stress":
+        suggestions = [
+            "Help me understand my stress",
+            "I feel overwhelmed",
+            "How can I organize my thoughts?",
+        ]
+
+    else:
+        suggestions = [
+            "Tell me more",
+            "Help me understand my feelings",
+            "I want to talk about this",
+        ]
+
+    return {
+        "reply": reply,
+        "emotion": emotion,
+        "suggestions": suggestions,
+        "ai_generated": bool(
+            HF_API_TOKEN and reply != get_fallback_response(emotion)
+        ),
+    }
+
 
 Base.metadata.create_all(bind=engine)
 
 app.add_middleware(
-     CORSMiddleware,
-    allow_origins=["*"],   # Temporary
+    CORSMiddleware,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Existing routers
 app.include_router(auth.router)
 app.include_router(users.router)
-#app.include_router(chatbot.router)
 app.include_router(journal.router)
-# AI router
-app.include_router(router, prefix="/ai")
+
+app.include_router(
+    router,
+    prefix="/ai",
+    tags=["AI"]
+)
+
 
 @app.get("/")
 def root():
-    return {"status": "Backend running"}
+    return {
+        "status": "Backend running",
+        "version": "1.1.0",
+    }
+
+
+@app.get("/health")
+def health():
+    return {
+        "status": "healthy",
+        "huggingface_configured": bool(HF_API_TOKEN),
+    }
