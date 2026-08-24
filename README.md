@@ -22,7 +22,8 @@ AI Therapy Assistant is a web-based mental wellness platform that provides users
 - 🔐 Secure User Registration & Login (JWT Authentication)
 - 🧠 Mental Health Self-Assessment
 - 🤖 AI Therapy Chatbot
-- 😊 Emotion Detection using Hugging Face Transformers
+- 😊 Emotion-Aware Conversations
+- 🤗 Hugging Face AI Integration
 - 📝 Reflection Journal
 - 📊 Assessment History
 - 💙 Mood Check-In
@@ -45,10 +46,11 @@ AI Therapy Assistant is a web-based mental wellness platform that provides users
 
 1. User submits a message through the React frontend.
 2. The request is sent to the FastAPI backend.
-3. The backend performs emotion analysis using a Hugging Face Transformer model.
-4. Based on the detected emotion and conversation context, the response engine generates supportive guidance.
-5. The AI response is returned to the frontend and displayed in the chat interface.
-
+3. The backend identifies emotional context from the user's message.
+4. The emotional context and recent conversation history are included in the AI prompt.
+5. A conversational AI model accessed through Hugging Face Inference Providers generates a supportive response.
+6. If the external AI service is unavailable, the backend returns an emotion-aware fallback response.
+7. The response and suggested follow-up actions are returned to the frontend.
 ---
 
 ## 🏗️ Architecture
@@ -57,19 +59,21 @@ AI Therapy Assistant is a web-based mental wellness platform that provides users
 User
    │
    ▼
-Next.js Frontend
+Next.js / React Frontend
    │
-REST API
+   │ REST API
    ▼
 FastAPI Backend
    │
- ├── JWT Authentication
- ├── Emotion Detection
- ├── AI Chatbot
- └── SQLAlchemy
-        │
-        ▼
-     SQLite Database
+   ├── JWT Authentication
+   ├── Emotion Detection
+   ├── Conversation Context
+   ├── Hugging Face AI Integration
+   ├── Fallback Response Handling
+   └── SQLAlchemy
+            │
+            ▼
+       SQLite Database
 ```
 
 ---
@@ -90,9 +94,11 @@ FastAPI Backend
 - JWT Authentication
 
 ### Artificial Intelligence
-- Hugging Face Transformers
-- Emotion Classification Model
-- Rule-Based Therapy Response Engine
+- Hugging Face Inference Providers
+- Conversational AI Model
+- Emotion-Aware Prompt Context
+- Rule-Based Emotion Detection
+- Fallback Response Handling
 
 ---
 
@@ -221,7 +227,7 @@ If you are experiencing severe emotional distress or a mental health emergency, 
 - 🤖 AI Wellness Summary
 - 📅 Daily Mood Tracking
 - ☁️ PostgreSQL Database
-- 🌐 Cloud Deployment
+- 🧠 Transformer-Based Emotion Classification
 
 ---
 
